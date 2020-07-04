@@ -46,8 +46,8 @@ public class JobThread extends Thread {
     public JobThread(int jobId, IJobHandler handler) {
         this.jobId = jobId;
         this.handler = handler;
-        this.triggerQueue = new LinkedBlockingQueue<TriggerParam>();
-        this.triggerLogIdSet = Collections.synchronizedSet(new HashSet<Long>());
+        this.triggerQueue = new LinkedBlockingQueue<>();
+        this.triggerLogIdSet = Collections.synchronizedSet(new HashSet<>());
     }
 
     public IJobHandler getHandler() {
@@ -64,7 +64,7 @@ public class JobThread extends Thread {
         // avoid repeat
         if (triggerLogIdSet.contains(triggerParam.getLogId())) {
             logger.info(">>>>>>>>>>> repeate trigger job, logId:{}", triggerParam.getLogId());
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "repeate trigger job, logId:" + triggerParam.getLogId());
+            return new ReturnT<>(ReturnT.FAIL_CODE, "repeate trigger job, logId:" + triggerParam.getLogId());
         }
 
         triggerLogIdSet.add(triggerParam.getLogId());
@@ -134,17 +134,17 @@ public class JobThread extends Thread {
                         Thread futureThread = null;
                         try {
                             final TriggerParam tgParamT = tgParam;
-                            FutureTask<ReturnT<String>> futureTask = new FutureTask<ReturnT<String>>(() -> handler.execute(tgParamT));
+                            FutureTask<ReturnT<String>> futureTask = new FutureTask<>(() -> handler.execute(tgParamT));
                             futureThread = new Thread(futureTask);
                             futureThread.start();
 
-                            executeResult = futureTask.get(tgParam.getExecutorTimeout(), TimeUnit.SECONDS);
+                            executeResult = futureTask.get(tgParam.getExecutorTimeout(), TimeUnit.MINUTES);
                         } catch (TimeoutException e) {
 
                             JobLogger.log("<br>----------- datax-web job execute timeout");
                             JobLogger.log(e);
 
-                            executeResult = new ReturnT<String>(IJobHandler.FAIL_TIMEOUT.getCode(), "job execute timeout ");
+                            executeResult = new ReturnT<>(IJobHandler.FAIL_TIMEOUT.getCode(), "job execute timeout ");
                         } finally {
                             futureThread.interrupt();
                         }
@@ -167,7 +167,7 @@ public class JobThread extends Thread {
                 } else {
                     if (idleTimes > 30) {
                         if (triggerQueue.size() == 0) {    // avoid concurrent trigger causes jobId-lost
-                            JobExecutor.removeJobThread(jobId, "excutor idel times over limit.");
+                            JobExecutor.removeJobThread(jobId, "executor idel times over limit.");
                         }
                     }
                 }
@@ -179,7 +179,7 @@ public class JobThread extends Thread {
                 StringWriter stringWriter = new StringWriter();
                 e.printStackTrace(new PrintWriter(stringWriter));
                 String errorMsg = stringWriter.toString();
-                executeResult = new ReturnT<String>(ReturnT.FAIL_CODE, errorMsg);
+                executeResult = new ReturnT<>(ReturnT.FAIL_CODE, errorMsg);
 
                 JobLogger.log("<br>----------- JobThread Exception:" + errorMsg + "<br>----------- datax-web job execute end(error) -----------");
             } finally {

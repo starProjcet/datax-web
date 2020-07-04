@@ -5,7 +5,9 @@ import com.wugui.datatx.core.biz.model.HandleCallbackParam;
 import com.wugui.datatx.core.biz.model.HandleProcessCallbackParam;
 import com.wugui.datatx.core.biz.model.RegistryParam;
 import com.wugui.datatx.core.biz.model.ReturnT;
+import com.wugui.datatx.core.enums.IncrementTypeEnum;
 import com.wugui.datatx.core.handler.IJobHandler;
+import com.wugui.datax.admin.core.kill.KillJob;
 import com.wugui.datax.admin.core.thread.JobTriggerPoolHelper;
 import com.wugui.datax.admin.core.trigger.TriggerTypeEnum;
 import com.wugui.datax.admin.core.util.I18nUtil;
@@ -77,9 +79,14 @@ public class AdminBizImpl implements AdminBiz {
 
         // trigger success, to trigger child job
         String callbackMsg = null;
-        if (IJobHandler.SUCCESS.getCode() == handleCallbackParam.getExecuteResult().getCode()) {
+        int resultCode = handleCallbackParam.getExecuteResult().getCode();
+
+        if (IJobHandler.SUCCESS.getCode() == resultCode) {
+
             JobInfo jobInfo = jobInfoMapper.loadById(log.getJobId());
-            jobInfoMapper.incrementTimeUpdate(log.getJobId(),log.getTriggerTime());
+
+            updateIncrementParam(log, jobInfo.getIncrementType());
+
             if (jobInfo != null && jobInfo.getChildJobId() != null && jobInfo.getChildJobId().trim().length() > 0) {
                 callbackMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_child_run") + "<<<<<<<<<<< </span><br>";
 
@@ -109,6 +116,11 @@ public class AdminBizImpl implements AdminBiz {
             }
         }
 
+        //kill execution timeout DataX process
+        if (!StringUtils.isEmpty(log.getProcessId()) && IJobHandler.FAIL_TIMEOUT.getCode() == resultCode) {
+            KillJob.trigger(log.getId(), log.getTriggerTime(), log.getExecutorAddress(), log.getProcessId());
+        }
+
         // handle msg
         StringBuffer handleMsg = new StringBuffer();
         if (log.getHandleMsg() != null) {
@@ -121,18 +133,32 @@ public class AdminBizImpl implements AdminBiz {
             handleMsg.append(callbackMsg);
         }
 
+        if (handleMsg.length() > 15000) {
+            handleMsg = new StringBuffer(handleMsg.substring(0, 15000));  // text最大64kb 避免长度过长
+        }
+
         // success, save log
         log.setHandleTime(new Date());
-        log.setHandleCode(handleCallbackParam.getExecuteResult().getCode());
+        log.setHandleCode(resultCode);
         log.setHandleMsg(handleMsg.toString());
+
         jobLogMapper.updateHandleInfo(log);
+        jobInfoMapper.updateLastHandleCode(log.getJobId(), resultCode);
 
         return ReturnT.SUCCESS;
     }
 
+    private void updateIncrementParam(JobLog log, Integer incrementType) {
+        if (IncrementTypeEnum.ID.getCode() == incrementType) {
+            jobInfoMapper.incrementIdUpdate(log.getJobId(),log.getMaxId());
+        } else if (IncrementTypeEnum.TIME.getCode() == incrementType) {
+            jobInfoMapper.incrementTimeUpdate(log.getJobId(), log.getTriggerTime());
+        }
+    }
+
     private boolean isNumeric(String str) {
         try {
-            int result = Integer.valueOf(str);
+            Integer.valueOf(str);
             return true;
         } catch (NumberFormatException e) {
             return false;
@@ -149,9 +175,11 @@ public class AdminBizImpl implements AdminBiz {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "Illegal Argument.");
         }
 
-        int ret = jobRegistryMapper.registryUpdate(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue(), new Date());
+        int ret = jobRegistryMapper.registryUpdate(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),
+                registryParam.getRegistryValue(), registryParam.getCpuUsage(), registryParam.getMemoryUsage(), registryParam.getLoadAverage(), new Date());
         if (ret < 1) {
-            jobRegistryMapper.registrySave(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue(), new Date());
+            jobRegistryMapper.registrySave(registryParam.getRegistryGroup(), registryParam.getRegistryKey(),
+                    registryParam.getRegistryValue(), registryParam.getCpuUsage(), registryParam.getMemoryUsage(), registryParam.getLoadAverage(), new Date());
 
             // fresh
             freshGroupRegistryInfo(registryParam);

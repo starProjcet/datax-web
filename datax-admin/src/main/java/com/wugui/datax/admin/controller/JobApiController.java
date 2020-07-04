@@ -26,9 +26,6 @@ public class JobApiController {
     @Resource
     private AdminBiz adminBiz;
 
-
-    // ---------------------- admin biz ----------------------
-
     /**
      * callback
      *
@@ -41,7 +38,7 @@ public class JobApiController {
         if (JobAdminConfig.getAdminConfig().getAccessToken()!=null
                 && JobAdminConfig.getAdminConfig().getAccessToken().trim().length()>0
                 && !JobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(JobRemotingUtil.XXL_RPC_ACCESS_TOKEN))) {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "The access token is wrong.");
+            return new ReturnT<>(ReturnT.FAIL_CODE, "The access token is wrong.");
         }
 
         // param
@@ -50,7 +47,7 @@ public class JobApiController {
             callbackParamList = JacksonUtil.readValue(data, List.class, HandleCallbackParam.class);
         } catch (Exception e) { }
         if (callbackParamList==null || callbackParamList.size()==0) {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "The request data invalid.");
+            return new ReturnT<>(ReturnT.FAIL_CODE, "The request data invalid.");
         }
 
         // invoke
@@ -69,7 +66,7 @@ public class JobApiController {
         if (JobAdminConfig.getAdminConfig().getAccessToken()!=null
                 && JobAdminConfig.getAdminConfig().getAccessToken().trim().length()>0
                 && !JobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(JobRemotingUtil.XXL_RPC_ACCESS_TOKEN))) {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "The access token is wrong.");
+            return new ReturnT<>(ReturnT.FAIL_CODE, "The access token is wrong.");
         }
 
         // param
@@ -78,7 +75,7 @@ public class JobApiController {
             callbackParamList = JacksonUtil.readValue(data, List.class, HandleProcessCallbackParam.class);
         } catch (Exception e) { }
         if (callbackParamList==null || callbackParamList.size()==0) {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "The request data invalid.");
+            return new ReturnT<>(ReturnT.FAIL_CODE, "The request data invalid.");
         }
 
         // invoke
@@ -127,7 +124,7 @@ public class JobApiController {
         if (JobAdminConfig.getAdminConfig().getAccessToken()!=null
                 && JobAdminConfig.getAdminConfig().getAccessToken().trim().length()>0
                 && !JobAdminConfig.getAdminConfig().getAccessToken().equals(request.getHeader(JobRemotingUtil.XXL_RPC_ACCESS_TOKEN))) {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "The access token is wrong.");
+            return new ReturnT<>(ReturnT.FAIL_CODE, "The access token is wrong.");
         }
 
         // param
@@ -136,13 +133,12 @@ public class JobApiController {
             registryParam = JacksonUtil.readValue(data, RegistryParam.class);
         } catch (Exception e) {}
         if (registryParam == null) {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "The request data invalid.");
+            return new ReturnT<>(ReturnT.FAIL_CODE, "The request data invalid.");
         }
 
         // invoke
         return adminBiz.registryRemove(registryParam);
     }
 
-    // ---------------------- job biz ----------------------
 
 }

@@ -10,43 +10,51 @@ import java.util.List;
 
 /**
  * job info
+ *
  * @author xuxueli 2016-1-12 18:03:45
  */
 @Mapper
 public interface JobInfoMapper {
 
-	public List<JobInfo> pageList(@Param("offset") int offset,
-								  @Param("pagesize") int pagesize,
-								  @Param("jobGroup") int jobGroup,
-								  @Param("triggerStatus") int triggerStatus,
-								  @Param("jobDesc") String jobDesc,
-								  @Param("glueType") String glueType,
-								  @Param("author") String author);
-	public int pageListCount(@Param("offset") int offset,
-                             @Param("pagesize") int pagesize,
-                             @Param("jobGroup") int jobGroup,
-                             @Param("triggerStatus") int triggerStatus,
-                             @Param("jobDesc") String jobDesc,
-                             @Param("glueType") String glueType,
-                             @Param("author") String author);
+    List<JobInfo> pageList(@Param("offset") int offset,
+                           @Param("pagesize") int pagesize,
+                           @Param("jobGroup") int jobGroup,
+                           @Param("triggerStatus") int triggerStatus,
+                           @Param("jobDesc") String jobDesc,
+                           @Param("glueType") String glueType,
+                           @Param("userId") int userId,
+                           @Param("projectIds") Integer[] projectIds);
 
-	public int save(JobInfo info);
+    int pageListCount(@Param("offset") int offset,
+                      @Param("pagesize") int pagesize,
+                      @Param("jobGroup") int jobGroup,
+                      @Param("triggerStatus") int triggerStatus,
+                      @Param("jobDesc") String jobDesc,
+                      @Param("glueType") String glueType,
+                      @Param("userId") int userId,
+                      @Param("projectIds") Integer[] projectIds);
 
-	public JobInfo loadById(@Param("id") int id);
+    List<JobInfo> findAll();
 
-	public int update(JobInfo jobInfo);
+    int save(JobInfo info);
 
-	public int delete(@Param("id") long id);
+    JobInfo loadById(@Param("id") int id);
 
-	public List<JobInfo> getJobsByGroup(@Param("jobGroup") int jobGroup);
+    int update(JobInfo jobInfo);
 
-	public int findAllCount();
+    int delete(@Param("id") long id);
 
-	public List<JobInfo> scheduleJobQuery(@Param("maxNextTime") long maxNextTime, @Param("pagesize") int pagesize);
+    List<JobInfo> getJobsByGroup(@Param("jobGroup") int jobGroup);
 
-	public int scheduleUpdate(JobInfo xxlJobInfo);
+    int findAllCount();
 
-	public int incrementTimeUpdate(@Param("id") int id, @Param("incStartTime") Date incStartTime);
+    List<JobInfo> scheduleJobQuery(@Param("maxNextTime") long maxNextTime, @Param("pagesize") int pagesize);
 
+    int scheduleUpdate(JobInfo xxlJobInfo);
 
+    int incrementTimeUpdate(@Param("id") int id, @Param("incStartTime") Date incStartTime);
+
+	public int updateLastHandleCode(@Param("id") int id,@Param("lastHandleCode")int lastHandleCode);
+
+    void incrementIdUpdate(@Param("id") int id, @Param("incStartId")Long incStartId);
 }

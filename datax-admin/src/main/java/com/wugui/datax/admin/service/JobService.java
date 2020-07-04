@@ -2,80 +2,95 @@ package com.wugui.datax.admin.service;
 
 
 import com.wugui.datatx.core.biz.model.ReturnT;
+import com.wugui.datax.admin.dto.DataXBatchJsonBuildDto;
+import com.wugui.datax.admin.dto.TaskScheduleDto;
 import com.wugui.datax.admin.entity.JobInfo;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 /**
  * core job action for datax-web
- * 
+ *
  * @author xuxueli 2016-5-28 15:30:33
  */
 public interface JobService {
 
-	/**
-	 * page list
-	 *
-	 * @param start
-	 * @param length
-	 * @param jobGroup
-	 * @param jobDesc
-	 * @param glueType
-	 * @param author
-	 * @return
-	 */
-	public Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String glueType, String author);
+    /**
+     * page list
+     *
+     * @param start
+     * @param length
+     * @param jobGroup
+     * @param jobDesc
+     * @param glueType
+     * @param userId
+     * @return
+     */
+    Map<String, Object> pageList(int start, int length, int jobGroup, int triggerStatus, String jobDesc, String glueType, int userId,Integer[] projectIds);
 
-	/**
-	 * add job
-	 *
-	 * @param jobInfo
-	 * @return
-	 */
-	public ReturnT<String> add(JobInfo jobInfo);
+    List<JobInfo> list();
 
-	/**
-	 * update job
-	 *
-	 * @param jobInfo
-	 * @return
-	 */
-	public ReturnT<String> update(JobInfo jobInfo);
+    /**
+     * add job
+     *
+     * @param jobInfo
+     * @return
+     */
+    ReturnT<String> add(JobInfo jobInfo);
 
-	/**
-	 * remove job
-	 * 	 *
-	 * @param id
-	 * @return
-	 */
-	public ReturnT<String> remove(int id);
+    /**
+     * update job
+     *
+     * @param jobInfo
+     * @return
+     */
+    ReturnT<String> update(JobInfo jobInfo);
 
-	/**
-	 * start job
-	 *
-	 * @param id
-	 * @return
-	 */
-	public ReturnT<String> start(int id);
+    /**
+     * remove job
+     * *
+     *
+     * @param id
+     * @return
+     */
+    ReturnT<String> remove(int id);
 
-	/**
-	 * stop job
-	 *
-	 * @param id
-	 * @return
-	 */
-	public ReturnT<String> stop(int id);
+    /**
+     * start job
+     *
+     * @param id
+     * @return
+     */
+    ReturnT<String> start(int id);
 
-	/**
-	 * dashboard info
-	 *
-	 * @return
-	 */
-	public Map<String, Object> dashboardInfo();
+    /**
+     * stop job
+     *
+     * @param id
+     * @return
+     */
+    ReturnT<String> stop(int id);
 
-	/**
-	 * chart info
-	 * @return
-	 */
-	public ReturnT<Map<String, Object>> chartInfo();
+    /**
+     * dashboard info
+     *
+     * @return
+     */
+    Map<String, Object> dashboardInfo();
+
+    /**
+     * chart info
+     *
+     * @return
+     */
+    ReturnT<Map<String, Object>> chartInfo();
+
+    /**
+     * batch add
+     * @param dto
+     * @return
+     */
+    ReturnT<String> batchAdd(DataXBatchJsonBuildDto dto) throws IOException;
 }

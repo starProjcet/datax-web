@@ -14,19 +14,28 @@ import java.util.List;
 @Repository
 public interface JobUserMapper {
 
-	public List<JobUser> pageList(@Param("offset") int offset,
-								  @Param("pagesize") int pagesize,
-								  @Param("username") String username);
-	public int pageListCount(@Param("offset") int offset,
-                             @Param("pagesize") int pagesize,
-                             @Param("username") String username);
+    List<JobUser> pageList(@Param("offset") int offset,
+                           @Param("pagesize") int pagesize,
+                           @Param("username") String username);
 
-	public JobUser loadByUserName(@Param("username") String username);
+    List<JobUser> findAll(@Param("username") String username);
 
-	public int save(JobUser xxlJobUser);
+    int pageListCount(@Param("offset") int offset,
+                      @Param("pagesize") int pagesize,
+                      @Param("username") String username);
 
-	public int update(JobUser xxlJobUser);
-	
-	public int delete(@Param("id") int id);
+    JobUser loadByUserName(@Param("username") String username);
+
+    JobUser getUserById(@Param("id") int id);
+
+    List<JobUser> getUsersByIds(@Param("ids") String[] ids);
+
+    int save(JobUser jobUser);
+
+    int update(JobUser jobUser);
+
+    int delete(@Param("id") int id);
+
+
 
 }
